@@ -266,19 +266,15 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         try {
             // Build message history with images
             const content: any[] = [{ type: 'text', text: refineInstruction }];
-            let current: IEntry | undefined = entry;
-            const allEntries = [...entries];
 
-            while (current) {
-                if (current.type === 'image' && current.imageUrl) {
-                    content.push({
-                        type: 'image_url',
-                        image_url: {
-                            url: current.imageUrl,
-                        },
-                    });
-                }
-                current = allEntries.find(e => e.uid === current!.parentUid);
+            // Only include the image from the current entry being refined
+            if (entry.type === 'image' && entry.imageUrl) {
+                content.push({
+                    type: 'image_url',
+                    image_url: {
+                        url: entry.imageUrl,
+                    },
+                });
             }
 
             if (includeAvatars) {
@@ -348,6 +344,10 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
 
     const handleDismiss = useCallback((uid: number) => {
         setEntries((prev) => prev.filter((entry) => entry.uid !== uid));
+    }, []);
+
+    const handleUpdateEntryContent = useCallback((uid: number, newContent: string) => {
+        setEntries(prev => prev.map(e => e.uid === uid ? { ...e, content: newContent } : e));
     }, []);
 
     const handlePostToChat = useCallback(async (entry: IEntry) => {
@@ -687,6 +687,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
                                         onGenerateImage={handleImageGeneration}
                                         onRefineImage={handleRefineImage}
                                         onPostToChat={handlePostToChat}
+                                        onUpdateEntryContent={handleUpdateEntryContent}
                                         isGenerating={isGenerating}
                                     />
                                 ))}

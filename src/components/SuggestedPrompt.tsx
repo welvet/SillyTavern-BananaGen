@@ -9,10 +9,11 @@ export interface SuggestedPromptProps {
     onGenerateImage: (entry: IEntry, includeAvatars: boolean) => void;
     onRefineImage: (entry: IEntry, refineInstruction: string, includeAvatars: boolean) => void;
     onPostToChat: (entry: IEntry) => void;
+    onUpdateEntryContent: (uid: number, newContent: string) => void;
     isGenerating: boolean;
 }
 
-export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText, onDismiss, onGenerateImage, onRefineImage, onPostToChat, isGenerating }) => {
+export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText, onDismiss, onGenerateImage, onRefineImage, onPostToChat, onUpdateEntryContent, isGenerating }) => {
     const [revisePrompt, setRevisePrompt] = useState('');
     const [includeAvatars, setIncludeAvatars] = useState(true);
 
@@ -48,7 +49,12 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
                     <img src={entry.imageUrl} alt={entry.comment} style={{ maxWidth: '100%', borderRadius: '8px' }} />
                 </div>
             )}
-            <div className="content">{entry.content}</div>
+            <STTextarea
+                value={entry.content}
+                onChange={(e) => onUpdateEntryContent(entry.uid, e.target.value)}
+                rows={6}
+                style={{ width: '100%', marginBottom: '10px' }}
+            />
             <div className="continue-prompt-section" style={{ marginTop: '10px' }}>
                 <STTextarea
                     value={revisePrompt}
