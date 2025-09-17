@@ -1,0 +1,11 @@
+{
+    "display_name": "Narrator",
+    "loading_order": 300,
+    "requires": [],
+    "optional": [],
+    "js": "dist/index.js",
+    "css": "dist/style.css",
+    "author": "welvet",
+    "version": "0.0.1",
+    "homePage": "https://github.com/welvet/SillyTavern-BananaGen"
+}
