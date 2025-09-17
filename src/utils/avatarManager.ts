@@ -21,7 +21,25 @@ export class AvatarManager {
         }));
     }
 
-    async getAvatarBase64(type: 'avatar' | 'persona', fileName: string): Promise<string> {
+    async getBackgrounds(): Promise<string[]> {
+        try {
+            const response = await fetch('/api/backgrounds/all', {
+                method: 'POST',
+                headers: SillyTavern.getContext().getRequestHeaders(),
+                body: JSON.stringify({}),
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch backgrounds: ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data.images ?? [];
+        } catch (error) {
+            console.error(`[BananaGen] Failed to get backgrounds:`, error);
+            return [];
+        }
+    }
+
+    async getAvatarBase64(type: 'avatar' | 'persona' | 'bg', fileName: string): Promise<string> {
         if (!fileName) return '';
         try {
             const thumbnailUrl = SillyTavern.getContext().getThumbnailUrl(type, fileName);

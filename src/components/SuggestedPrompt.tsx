@@ -6,7 +6,7 @@ export interface SuggestedPromptProps {
     entry: IEntry;
     onReviseText: (entry: IEntry, prompt: string) => void;
     onDismiss: (uid: number) => void;
-    onGenerateImage: (entry: IEntry) => void;
+    onGenerateImage: (entry: IEntry, includeAvatars: boolean) => void;
     onRefineImage: (entry: IEntry, refineInstruction: string, includeAvatars: boolean) => void;
     onPostToChat: (entry: IEntry) => void;
     isGenerating: boolean;
@@ -26,7 +26,7 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
         <div className="entry">
             <div className="menu">
                 {entry.type === 'text' && (
-                    <STButton onClick={() => onGenerateImage(entry)} className="menu_button interactable generate" title="Generate an image from this prompt." disabled={isGenerating}>
+                    <STButton onClick={() => onGenerateImage(entry, includeAvatars)} className="menu_button interactable generate" title="Generate an image from this prompt." disabled={isGenerating}>
                         {isGenerating ? '...' : 'Generate Image'}
                     </STButton>
                 )}
@@ -57,18 +57,17 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
                     rows={2}
                     style={{ width: '100%' }}
                 />
-                {entry.type === 'text' ? (
-                    <STButton
-                        onClick={() => onReviseText(entry, revisePrompt)}
-                        disabled={isGenerating}
-                        className="menu_button interactable revise"
-                        title="Revise the text prompt."
-                        style={{ marginTop: '5px' }}
-                    >
-                        {isGenerating ? '...' : 'Revise Text'}
-                    </STButton>
-                ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
+                    {entry.type === 'text' ? (
+                        <STButton
+                            onClick={() => onReviseText(entry, revisePrompt)}
+                            disabled={isGenerating}
+                            className="menu_button interactable revise"
+                            title="Revise the text prompt."
+                        >
+                            {isGenerating ? '...' : 'Revise Text'}
+                        </STButton>
+                    ) : (
                         <STButton
                             onClick={() => onRefineImage(entry, revisePrompt, includeAvatars)}
                             disabled={isGenerating}
@@ -77,16 +76,16 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
                         >
                             {isGenerating ? '...' : 'Refine Image'}
                         </STButton>
-                        <label className="checkbox_label">
-                            <input
-                                type="checkbox"
-                                checked={includeAvatars}
-                                onChange={(e) => setIncludeAvatars(e.target.checked)}
-                            />
-                            Include Avatars
-                        </label>
-                    </div>
-                )}
+                    )}
+                    <label className="checkbox_label">
+                        <input
+                            type="checkbox"
+                            checked={includeAvatars}
+                            onChange={(e) => setIncludeAvatars(e.target.checked)}
+                        />
+                        Include Avatars
+                    </label>
+                </div>
             </div>
         </div>
     );

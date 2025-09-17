@@ -45,14 +45,17 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [characters, setCharacters] = useState<AvatarItem[]>([]);
     const [personas, setPersonas] = useState<AvatarItem[]>([]);
+    const [backgrounds, setBackgrounds] = useState<string[]>([]);
     const [selectedCharacter, setSelectedCharacter] = useState<string>('');
     const [selectedPersona, setSelectedPersona] = useState<string>('');
+    const [selectedBackground, setSelectedBackground] = useState<string>('');
 
     const avatarManager = useMemo(() => new AvatarManager(), []);
 
     useEffect(() => {
         const chars = avatarManager.getCharacters();
         const pers = avatarManager.getPersonas();
+        avatarManager.getBackgrounds().then(bgs => setBackgrounds(bgs));
         setCharacters(chars);
         setPersonas(pers);
         // @ts-ignore
@@ -189,33 +192,52 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         [settings, entries],
     );
 
-    const handleImageGeneration = useCallback(async (entry: IEntry) => {
+    const handleImageGeneration = useCallback(async (entry: IEntry, includeAvatars: boolean) => {
         if (!settings.imageProfileId) return st_echo('warning', 'Please select an image generation profile.');
 
         setIsGenerating(true);
         try {
             const messages: any[] = [{ role: 'user', content: entry.content }];
 
-            const charAvatar = await avatarManager.getAvatarBase64('avatar', selectedCharacter);
-            const personaAvatar = await avatarManager.getAvatarBase64('persona', selectedPersona);
+            if (includeAvatars) {
+                const charAvatar = await avatarManager.getAvatarBase64('avatar', selectedCharacter);
+                const personaAvatar = await avatarManager.getAvatarBase64('persona', selectedPersona);
+                const background = await avatarManager.getAvatarBase64('bg', selectedBackground);
 
-            if (charAvatar) {
-                messages[0].content = [{ type: 'text', text: messages[0].content }, { type: 'image_url', image_url: { url: charAvatar } }];
-            }
-            if (personaAvatar) {
-                if (Array.isArray(messages[0].content)) {
-                    messages[0].content.push({ type: 'image_url', image_url: { url: personaAvatar } });
-                } else {
-                    messages[0].content = [{ type: 'text', text: messages[0].content }, { type: 'image_url', image_url: { url: personaAvatar } }];
+                if (charAvatar) {
+                    messages[0].content = [{ type: 'text', text: messages[0].content }, { type: 'image_url', image_url: { url: charAvatar } }];
+                }
+                if (personaAvatar) {
+                    if (Array.isArray(messages[0].content)) {
+                        messages[0].content.push({ type: 'image_url', image_url: { url: personaAvatar } });
+                    } else {
+                        messages[0].content = [{ type: 'text', text: messages[0].content }, { type: 'image_url', image_url: { url: personaAvatar } }];
+                    }
+                }
+                if (background) {
+                    if (Array.isArray(messages[0].content)) {
+                        messages[0].content.push({ type: 'image_url', image_url: { url: background } });
+                    } else {
+                        messages[0].content = [{ type: 'text', text: messages[0].content }, { type: 'image_url', image_url: { url: background } }];
+                    }
                 }
             }
 
-            const imageUrl = await runImageGeneration({
+            const { imageUrl, textResponse } = await runImageGeneration({
                 profileId: settings.imageProfileId,
                 imagePromptTemplate: settings.prompts.imagePromptTemplate.content,
                 maxResponseToken: settings.maxResponseToken,
                 messages,
             });
+
+            if (textResponse) {
+                st_echo(imageUrl ? 'success' : 'info', textResponse);
+            }
+
+            if (!imageUrl) {
+                st_echo('error', 'Image generation failed. No image was returned.');
+                return;
+            }
 
             const newImageEntry: IEntry = {
                 ...entry,
@@ -234,7 +256,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         } finally {
             setIsGenerating(false);
         }
-    }, [settings, selectedCharacter, selectedPersona]);
+    }, [settings, selectedCharacter, selectedPersona, selectedBackground, avatarManager]);
 
     const handleRefineImage = useCallback(async (entry: IEntry, refineInstruction: string, includeAvatars: boolean) => {
         if (!settings.imageProfileId) return st_echo('warning', 'Please select an image generation profile.');
@@ -262,12 +284,16 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
             if (includeAvatars) {
                 const charAvatar = await avatarManager.getAvatarBase64('avatar', selectedCharacter);
                 const personaAvatar = await avatarManager.getAvatarBase64('persona', selectedPersona);
+                const background = await avatarManager.getAvatarBase64('bg', selectedBackground);
 
                 if (charAvatar) {
                     content.push({ type: 'image_url', image_url: { url: charAvatar } });
                 }
                 if (personaAvatar) {
                     content.push({ type: 'image_url', image_url: { url: personaAvatar } });
+                }
+                if (background) {
+                    content.push({ type: 'image_url', image_url: { url: background } });
                 }
             }
 
@@ -276,12 +302,21 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
                 content: content.reverse(), // Reverse to put text first, then images
             }];
 
-            const imageUrl = await runImageGeneration({
+            const { imageUrl, textResponse } = await runImageGeneration({
                 profileId: settings.imageProfileId,
                 imagePromptTemplate: settings.prompts.imagePromptTemplate.content,
                 maxResponseToken: settings.maxResponseToken,
                 messages,
             });
+
+            if (textResponse) {
+                st_echo(imageUrl ? 'success' : 'info', textResponse);
+            }
+
+            if (!imageUrl) {
+                st_echo('error', 'Image refinement failed. No image was returned.');
+                return;
+            }
 
             const newImageEntry: IEntry = {
                 ...entry,
@@ -301,7 +336,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         } finally {
             setIsGenerating(false);
         }
-    }, [settings, entries, selectedCharacter, selectedPersona, avatarManager]);
+    }, [settings, entries, selectedCharacter, selectedPersona, selectedBackground, avatarManager]);
 
 
     const handleReviseText = useCallback(
@@ -398,6 +433,11 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
                             <select className="text_pole" value={selectedPersona} onChange={(e) => setSelectedPersona(e.target.value)}>
                                 <option value="">None</option>
                                 {personas.map(p => <option key={p.avatarFile} value={p.avatarFile}>{p.name}</option>)}
+                            </select>
+                            <label style={{ marginTop: '10px' }}>Background</label>
+                            <select className="text_pole" value={selectedBackground} onChange={(e) => setSelectedBackground(e.target.value)}>
+                                <option value="">None</option>
+                                {backgrounds.map(bg => <option key={bg} value={bg}>{bg}</option>)}
                             </select>
                         </div>
 

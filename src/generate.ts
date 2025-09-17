@@ -168,7 +168,7 @@ export async function runImageGeneration({
   imagePromptTemplate,
   maxResponseToken,
   messages,
-}: RunImageGenerationParams): Promise<string> { // Returns image URL as a string
+}: RunImageGenerationParams): Promise<{ imageUrl: string; textResponse: string }> { // Returns image URL and text response
   if (!profileId) {
     throw new Error('No connection profile selected.');
   }
@@ -212,10 +212,12 @@ export async function runImageGeneration({
 
   console.log('Raw image model output:', JSON.stringify(response, null, 2));
 
-  // Extract the image URL from the new response structure
-  const imageUrl = response?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+  // Extract the image URL and text response from the new response structure
+  const message = response?.choices?.[0]?.message;
+  const imageUrl = message?.images?.[0]?.image_url?.url || '';
+  const textResponse = message?.content || '';
 
-  return imageUrl || '';
+  return { imageUrl, textResponse };
 }
 
 // Helper for slash command enum provider
