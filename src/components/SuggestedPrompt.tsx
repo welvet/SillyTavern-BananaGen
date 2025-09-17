@@ -7,13 +7,14 @@ export interface SuggestedPromptProps {
     onReviseText: (entry: IEntry, prompt: string) => void;
     onDismiss: (uid: number) => void;
     onGenerateImage: (entry: IEntry) => void;
-    onRefineImage: (entry: IEntry, refineInstruction: string) => void;
+    onRefineImage: (entry: IEntry, refineInstruction: string, includeAvatars: boolean) => void;
     onPostToChat: (entry: IEntry) => void;
     isGenerating: boolean;
 }
 
 export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText, onDismiss, onGenerateImage, onRefineImage, onPostToChat, isGenerating }) => {
     const [revisePrompt, setRevisePrompt] = useState('');
+    const [includeAvatars, setIncludeAvatars] = useState(true);
 
     const handleCopyToClipboard = () => {
         navigator.clipboard.writeText(entry.content);
@@ -67,15 +68,24 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
                         {isGenerating ? '...' : 'Revise Text'}
                     </STButton>
                 ) : (
-                    <STButton
-                        onClick={() => onRefineImage(entry, revisePrompt)}
-                        disabled={isGenerating}
-                        className="menu_button interactable revise"
-                        title="Refine the generated image."
-                        style={{ marginTop: '5px' }}
-                    >
-                        {isGenerating ? '...' : 'Refine Image'}
-                    </STButton>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
+                        <STButton
+                            onClick={() => onRefineImage(entry, revisePrompt, includeAvatars)}
+                            disabled={isGenerating}
+                            className="menu_button interactable revise"
+                            title="Refine the generated image."
+                        >
+                            {isGenerating ? '...' : 'Refine Image'}
+                        </STButton>
+                        <label className="checkbox_label">
+                            <input
+                                type="checkbox"
+                                checked={includeAvatars}
+                                onChange={(e) => setIncludeAvatars(e.target.checked)}
+                            />
+                            Include Avatars
+                        </label>
+                    </div>
                 )}
             </div>
         </div>

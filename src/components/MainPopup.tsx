@@ -236,7 +236,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         }
     }, [settings, selectedCharacter, selectedPersona]);
 
-    const handleRefineImage = useCallback(async (entry: IEntry, refineInstruction: string) => {
+    const handleRefineImage = useCallback(async (entry: IEntry, refineInstruction: string, includeAvatars: boolean) => {
         if (!settings.imageProfileId) return st_echo('warning', 'Please select an image generation profile.');
         if (!refineInstruction) return st_echo('warning', 'Please enter refinement instructions.');
 
@@ -259,14 +259,16 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
                 current = allEntries.find(e => e.uid === current!.parentUid);
             }
 
-            const charAvatar = await avatarManager.getAvatarBase64('avatar', selectedCharacter);
-            const personaAvatar = await avatarManager.getAvatarBase64('persona', selectedPersona);
+            if (includeAvatars) {
+                const charAvatar = await avatarManager.getAvatarBase64('avatar', selectedCharacter);
+                const personaAvatar = await avatarManager.getAvatarBase64('persona', selectedPersona);
 
-            if (charAvatar) {
-                content.push({ type: 'image_url', image_url: { url: charAvatar } });
-            }
-            if (personaAvatar) {
-                content.push({ type: 'image_url', image_url: { url: personaAvatar } });
+                if (charAvatar) {
+                    content.push({ type: 'image_url', image_url: { url: charAvatar } });
+                }
+                if (personaAvatar) {
+                    content.push({ type: 'image_url', image_url: { url: personaAvatar } });
+                }
             }
 
             const messages = [{
@@ -299,7 +301,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         } finally {
             setIsGenerating(false);
         }
-    }, [settings, entries, selectedCharacter, selectedPersona]);
+    }, [settings, entries, selectedCharacter, selectedPersona, avatarManager]);
 
 
     const handleReviseText = useCallback(
