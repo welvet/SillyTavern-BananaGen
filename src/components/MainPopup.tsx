@@ -369,7 +369,7 @@ export const MainPopup: FC<MainPopupProps> = ({ onClose }) => {
         }
 
         const message = {
-            name: 'System',
+            name: 'Narrator',
             is_user: false,
             is_system: true,
             send_date: Date.now(),
