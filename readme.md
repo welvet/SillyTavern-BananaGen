@@ -5,14 +5,12 @@
 A [SillyTavern](https://docs.sillytavern.app/) extension for generating images based on your stories. It uses a two-stage process:
 
 1.  A **Text LLM** generates detailed, creative prompts suitable for an image model.
-2.  An **Image LLM** takes those prompts and generates the final image (only tested on google/gemini-2.5-flash-image-preview with openrouter).
-
-This workflow allows for a high degree of control and creativity, enabling you to bring your characters and scenes to life visually.
-
 <img width="1717" height="1067" alt="image" src="https://github.com/user-attachments/assets/65159f96-abe5-4932-bca5-c2f08d43cc5b" />
 
+2.  An **Image LLM** takes those prompts and generates the final image (only tested on google/gemini-2.5-flash-image-preview with openrouter).
 <img width="1258" height="1046" alt="image" src="https://github.com/user-attachments/assets/b249bfbb-7b93-45a8-b0a2-e1915bdc9f7a" />
 
+This workflow allows for a high degree of control and creativity, enabling you to bring your characters and scenes to life visually.
 
 ## Features
 
