@@ -9,6 +9,11 @@ A [SillyTavern](https://docs.sillytavern.app/) extension for generating images b
 
 This workflow allows for a high degree of control and creativity, enabling you to bring your characters and scenes to life visually.
 
+<img width="1717" height="1067" alt="image" src="https://github.com/user-attachments/assets/65159f96-abe5-4932-bca5-c2f08d43cc5b" />
+
+<img width="1258" height="1046" alt="image" src="https://github.com/user-attachments/assets/b249bfbb-7b93-45a8-b0a2-e1915bdc9f7a" />
+
+
 ## Features
 
 -   **Two-Stage Generation**: Uses a text model to craft perfect image prompts, then sends them to an image model.
@@ -43,6 +48,8 @@ This workflow allows for a high degree of control and creativity, enabling you t
 ## Configuration
 
 This extension is designed to be highly flexible. You can customize the core prompts that guide the AI by going to the main SillyTavern settings, navigating to the **Extensions** tab, and finding the **BananaGen** section. Here, you can edit the templates for the prompt generator's role, the XML format rules, the image prompt template, and more.
+
+<img width="1708" height="1091" alt="image" src="https://github.com/user-attachments/assets/51679365-1e76-4401-a8c6-563d93890ae1" />
 
 ## Acknowledgements
 
