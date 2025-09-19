@@ -52,7 +52,7 @@ export const SuggestedPrompt: FC<SuggestedPromptProps> = ({ entry, onReviseText,
             <STTextarea
                 value={entry.content}
                 onChange={(e) => onUpdateEntryContent(entry.uid, e.target.value)}
-                rows={6}
+                rows={4}
                 style={{ width: '100%', marginBottom: '10px' }}
             />
             <div className="continue-prompt-section" style={{ marginTop: '10px' }}>
